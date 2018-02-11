@@ -64,6 +64,19 @@ public class AssembleTextFragment {
             for (String fragment : text) {
 
                 /*
+                    Check whether the fragment contains the string
+                    in both the forward and reverse direction
+                 */
+                if (referenceString.contains(fragment)) {
+                    maxOverlap = fragment.length();
+                    other = fragment;
+                } else if (fragment.contains(referenceString)) {
+                    maxOverlap = referenceString.length();
+                    referenceString = fragment;
+                    other = fragment;
+                }
+
+                /*
                     Check for an overlap between the reference
                     string and the other strings inside the text:
                     reference + other strings
@@ -84,18 +97,6 @@ public class AssembleTextFragment {
                     other = fragment;
                 }
 
-                /*
-                    Check whether the fragment contains the string
-                    in both the forward and reverse direction
-                 */
-                if (referenceString.contains(fragment)) {
-                    maxOverlap = fragment.length();
-                    other = fragment;
-                } else if (fragment.contains(referenceString)) {
-                    maxOverlap = referenceString.length();
-                    referenceString = fragment;
-                    other = fragment;
-                }
             }
 
             referenceString = assembledString(referenceString, other, maxOverlap);
