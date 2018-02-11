@@ -9,9 +9,6 @@ import java.util.logging.Logger;
 public class AssembleTextFragment {
     private static final Logger LOGGER = Logger.getLogger(AssembleTextFragment.class.getName());
 
-    AssembleTextFragment() {
-    }
-
     public void assembledText(String filename) {
         try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
             String fragmentProblem;
@@ -27,46 +24,33 @@ public class AssembleTextFragment {
         }
     }
 
-    private String reassemble(String fragmentProblem) {
-        int maxOverlap = 0;
-        String other = "";
-        int iterations = 0;
+    private String reassemble(final String fragmentProblem) {
 
-        // Break string fragment into a list<String>
         List<String> text = new ArrayList<>(Arrays.asList(fragmentProblem.split(";")));
 
-        /*
-            Check if we have data in the arraylist
-            else return a empty string
-          */
         if (text.isEmpty()) {
             return "";
         }
 
-        return checkForAssembledString(maxOverlap, other, iterations, text);
+        int maxOverlap = 0;
+        String overlapping = "";
+
+        return checkForAssembledString(text, maxOverlap, overlapping);
     }
 
-    private String checkForAssembledString(int maxOverlap, String other, int iterations, List<String> text) {
+    private String checkForAssembledString(List<String> text, int maxOverlap, String overlapping) {
 
-        /*
-            Get first string from the list, then
-            remove this from the remaining list
-         */
         String referenceString = text.get(0);
         text.remove(referenceString);
 
-        return iterateStringForOverlap(maxOverlap, other, iterations, text, referenceString);
+        return iterateForStringOverlap(text, maxOverlap, overlapping, referenceString);
     }
 
-    private String iterateStringForOverlap(int maxOverlap, String other, int iterations, List<String> text, String referenceString) {
-        while (text.size() > 0 && iterations < text.size()) {
+    private String iterateForStringOverlap(List<String> text, int maxOverlap, String other, String referenceString) {
 
-            for (String fragment : text) {
+        while (text.size() > 0) {
+            for (final String fragment : text) {
 
-                /*
-                    Check whether the fragment contains the string
-                    in both the forward and reverse direction
-                 */
                 if (referenceString.contains(fragment)) {
                     maxOverlap = fragment.length();
                     other = fragment;
@@ -76,71 +60,55 @@ public class AssembleTextFragment {
                     other = fragment;
                 }
 
-                /*
-                    Check for an overlap between the reference
-                    string and the other strings inside the text:
-                    reference + other strings
-                 */
-                int overlapFound = overlap(referenceString, fragment);
-                if (overlapFound > maxOverlap) {
-                    maxOverlap = overlapFound;
+                int overlap = overlap(referenceString, fragment);
+                if (overlap > maxOverlap) {
+                    maxOverlap = overlap;
                     other = fragment;
                 }
 
-                /*
-                    Check for the overlap between the reverse:
-                    other strings + reference string
-                 */
-                overlapFound = overlap(fragment, referenceString);
-                if (overlapFound > maxOverlap) {
-                    maxOverlap = overlapFound;
+                overlap = overlap(fragment, referenceString);
+                if (overlap > maxOverlap) {
+                    maxOverlap = overlap;
                     other = fragment;
                 }
 
             }
-
-            referenceString = assembledString(referenceString, other, maxOverlap);
+            referenceString = recombine(referenceString, other, maxOverlap);
             text.remove(other);
             maxOverlap = 0;
             other = "";
-            iterations++;
         }
+
         return referenceString;
     }
 
-    private String assembledString(String referenceString, String other, int maxOverlap) {
+    private String recombine(String reference, String other, int overlap) {
 
-        boolean forwardMatch = referenceString.substring((referenceString.length() - maxOverlap), referenceString.length())
-                .equals(other.substring(0, maxOverlap));
+        boolean forwardMatch = reference.substring((reference.length() - overlap), reference.length())
+                .equals(other.substring(0, overlap));
+        boolean reverseMatch = other.substring((other.length() - overlap), other.length())
+                .equals(reference.substring(0, overlap));
 
         if (forwardMatch) {
-            other = other.substring(maxOverlap, other.length());
-            return referenceString + other;
+            other = other.substring(overlap, other.length());
+            return reference + other;
+        } else if (reverseMatch) {
+            reference = reference.substring(overlap, reference.length());
+            return other + reference;
         } else {
-            boolean reverseMatch = other.substring((other.length() - maxOverlap), other.length())
-                    .equals(referenceString.substring(0, maxOverlap));
-
-            if (reverseMatch) {
-                referenceString = referenceString.substring(maxOverlap, referenceString.length());
-                return other + referenceString;
-            } else {
-                return referenceString;
-            }
+            return reference;
         }
     }
 
-    private int overlap(final String referenceString, final String other) {
+    private int overlap(final String str1, final String str2) {
+        int maxOverlap = str2.length() - 1;
 
-        int maxOverlap = other.length() - 1;
-
-        /*
-            Find the longest (maximum) match by starting from
-            the longest none match to the final maximum match
-         */
-        while (!referenceString.regionMatches(true,referenceString.length() - maxOverlap, other, 0,maxOverlap)) {
+        while (!str1.regionMatches(str1.length() - maxOverlap, str2, 0,
+                maxOverlap)) {
             maxOverlap--;
         }
 
         return maxOverlap;
     }
 }
+
