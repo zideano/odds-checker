@@ -16,7 +16,6 @@ public class AssembleTextFragment {
             String fragmentProblem;
 
             while ((fragmentProblem = in.readLine()) != null) {
-                LOGGER.log(Level.INFO, "Assembled text");
                 System.out.println(reassemble(fragmentProblem));
             }
 
