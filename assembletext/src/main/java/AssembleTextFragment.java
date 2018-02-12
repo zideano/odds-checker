@@ -74,7 +74,7 @@ public class AssembleTextFragment {
                 int overlap;
 
                 /*
-                    First check is the reference string is already composed of the
+                    First check if the reference string is already composed of the
                     other text fragments in both the forward and reverse directions
                  */
                 if (referenceString.contains(fragment)) {
@@ -105,7 +105,7 @@ public class AssembleTextFragment {
             }
 
             /*
-               Get reference string and update the list again
+               Get updated reference string and update the list again
             */
             referenceString = concatenateString(referenceString, other, maxOverlap);
             text.remove(other);
@@ -148,6 +148,11 @@ public class AssembleTextFragment {
     private int overlap(final @NotNull String referenceString, final @NotNull String other) {
         int maxOverlap = other.length() - 1;
 
+        /*
+            Find the region of maximum overlap or reduce maxOverlap
+            to zero otherwise when there is no overlap between reference
+            and other.
+         */
         while (!referenceString.regionMatches(true,referenceString.length() - maxOverlap, other, 0,
                 maxOverlap)) {
             maxOverlap--;
