@@ -21,7 +21,7 @@ public class AssembleTextFragment {
             }
 
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -36,6 +36,7 @@ public class AssembleTextFragment {
 
         List<String> text = new ArrayList<>(Arrays.asList(fragmentProblem.split(";")));
 
+        // Return a empty string if the list is empty
         if (text.isEmpty()) {
             return "";
         }
